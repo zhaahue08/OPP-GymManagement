@@ -1,0 +1,59 @@
+\section{Nạp chồng toán tử trong module Check-in và InBody}
+Module theo dõi tập luyện gồm bốn lớp: \texttt{LichSuCheckIn}, \texttt{InBody}, \texttt{PhieuInBody} và việc check-in thực tế qua \texttt{HoiVien}. Nạp chồng toán tử giúp mã nguồn nghiệp vụ gần với cách diễn đạt tự nhiên: ``hội viên check-in'' viết là \texttt{++hoiVien}, ``in/đọc phiếu'' viết là \texttt{std::cout << phieu}~\cite{stroustrup2013}.
+
+\subsection{Toán tử \texttt{++} tiền tố và hậu tố}
+Hai dạng của \texttt{operator++} có ngữ nghĩa khác nhau và được phân biệt bằng tham số giả \texttt{int}:
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Tiền tố} \texttt{++h} ghi một buổi tập vào ngày hôm nay và trả về tham chiếu tới chính đối tượng, nên có thể viết chuỗi và không sao chép.
+  \item \textbf{Hậu tố} \texttt{h++} trả về một \emph{bản sao trước khi tăng}. Vì phải sao chép nên tốn kém hơn; trong mã nguồn nhóm ưu tiên dạng tiền tố và hậu tố được cài đặt dựa trên tiền tố để tránh lặp logic.
+\end{itemize}
+\begin{lstlisting}
+LichSuCheckIn& LichSuCheckIn::operator++() { themNgay(today()); return *this; }
+LichSuCheckIn LichSuCheckIn::operator++(int) { LichSuCheckIn truoc = *this; ++*this; return truoc; }
+\end{lstlisting}
+Với \texttt{HoiVien}, \texttt{operator++} còn kiểm tra trạng thái thẻ (State Pattern), hạn thẻ và số buổi còn lại trước khi trừ buổi; mỗi lượt quẹt thẻ được tính là một buổi tập. Luồng xử lý được mô tả trong sơ đồ tuần tự \texttt{docs/uml/checkin\_sequence.puml}.
+
+\subsection{Toán tử nhập xuất luồng \texttt{<<} và \texttt{>>}}
+Hai toán tử này không thể là hàm thành viên của lớp (vế trái là \texttt{ostream}/\texttt{istream}) nên được khai báo \texttt{friend} để truy cập thành viên \texttt{private} mà vẫn giữ đóng gói. Nhóm áp dụng ba quy ước:
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Đối xứng}: định dạng \texttt{<<} ghi ra có thể được \texttt{>>} đọc lại nguyên vẹn (kiểm thử vòng ghi--đọc trong \texttt{tests/test\_tracking.cpp}). Ví dụ phiếu InBody: \texttt{HV001 2026-03-05 170 66 20 30}.
+  \item \textbf{Chỉ gán khi thành công}: \texttt{>>} đọc vào biến tạm, kiểm tra hợp lệ rồi mới gán; nếu sai kiểu hoặc vi phạm ràng buộc thì đặt \texttt{failbit} và giữ nguyên đối tượng đích.
+  \item \textbf{Không ném ngoại lệ ra khỏi \texttt{>>}}: lỗi dữ liệu được báo qua trạng thái luồng như thư viện chuẩn, bên gọi kiểm tra bằng \texttt{if (in >> x)}.
+\end{enumerate}
+\begin{lstlisting}
+std::istream& operator>>(std::istream& in, InBody& x) {
+    double cao, nang, mo, co;
+    if (in >> cao >> nang >> mo >> co) {
+        try { x = InBody(cao, nang, mo, co); }
+        catch (const std::invalid_argument&) { in.setstate(std::ios::failbit); }
+    }
+    return in;
+}
+\end{lstlisting}
+Ngoài ra \texttt{PhieuInBody} nạp chồng \texttt{operator-} để tính chênh lệch cân nặng, tỉ lệ mỡ và khối lượng cơ so với phiếu trước, và \texttt{operator<} để sắp xếp phiếu theo ngày đo.
+
+\section{Ràng buộc dữ liệu InBody}
+Mọi kiểm tra nằm trong constructor để không thể tạo đối tượng ở trạng thái sai (bất biến lớp). Điều kiện được viết dạng phủ định \texttt{!(a >= x \&\& a <= y)} để giá trị \texttt{NaN} cũng bị từ chối.
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Trường} & \textbf{Ràng buộc} & \textbf{Ngoại lệ khi vi phạm} \\
+\midrule
+Chiều cao & $50 \le h \le 250$ cm & \texttt{invalid\_argument} \\
+Cân nặng & $10 \le w \le 300$ kg & \texttt{invalid\_argument} \\
+Phần trăm mỡ & $0 \le f \le 100$ & \texttt{invalid\_argument} \\
+Khối lượng cơ & $0 \le m \le w$ & \texttt{invalid\_argument} \\
+Ngày đo (phiếu) & hợp lệ, không ở tương lai & \texttt{invalid\_argument} \\
+Mã hội viên & không rỗng & \texttt{invalid\_argument} \\
+\bottomrule
+\end{tabular}
+\caption{Ràng buộc dữ liệu của \texttt{InBody} và \texttt{PhieuInBody}}
+\end{table}
+Chỉ số BMI tính theo $\mathrm{BMI} = w / (h/100)^2$ và được phân loại theo ngưỡng châu Á--Thái Bình Dương: dưới 18,5 là thiếu cân; từ 18,5 đến dưới 23 là bình thường; từ 23 đến dưới 25 là thừa cân; từ 25 trở lên là béo phì. Chỉ số chỉ mang tính tham khảo, không thay thế tư vấn y tế.
+
+\subsection{Ràng buộc của lịch sử check-in}
+\texttt{LichSuCheckIn::themNgay} từ chối ngày không hợp lệ, ngày ở tương lai và ngày sớm hơn lần check-in trước, nhờ đó danh sách luôn tăng dần và các thống kê như \texttt{soBuoiTrongThang} không cần sắp xếp lại. Khi một lệnh thêm bị từ chối, dữ liệu cũ không bị thay đổi (bảo đảm ngoại lệ mạnh).
+
+\subsection{Kiểm thử}
+Tệp \texttt{tests/test\_tracking.cpp} gồm 45 phép kiểm tra: giá trị biên và NaN của InBody, phân loại BMI, vòng ghi--đọc, đọc dữ liệu sai (sai kiểu, ngày không tồn tại, thiếu dòng, ngày giảm dần) và tích hợp với \texttt{HoiVien} qua \texttt{++}. Chạy bằng \texttt{cmake --build build \&\& build/test\_tracking}.

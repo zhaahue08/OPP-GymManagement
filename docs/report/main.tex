@@ -1,0 +1,40 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[T5]{fontenc}
+\usepackage[vietnamese]{babel}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{caption}
+\usepackage{enumitem}
+\hypersetup{colorlinks=true,linkcolor=blue,citecolor=teal,urlcolor=blue}
+\lstdefinestyle{cpp}{language=C++,basicstyle=\ttfamily\small,keywordstyle=\color{blue!70!black},commentstyle=\color{green!40!black},stringstyle=\color{red!60!black},numbers=left,numberstyle=\tiny,breaklines=true,frame=single,showstringspaces=false}
+\lstset{style=cpp}
+\title{Hệ thống Quản lý Trung tâm Thể hình\\\large Fitness CRM -- Đồ án Phương pháp Lập trình Hướng đối tượng}
+\author{Nhóm 5 thành viên}
+\date{\today}
+\begin{document}
+\maketitle
+\pagenumbering{roman}
+\tableofcontents
+\listoffigures
+\clearpage
+\pagenumbering{arabic}
+\input{chuong/chuong1_tongquan}
+\input{chuong/chuong2_phan_tich}
+\input{chuong/chuong3_thiet_ke}
+\input{chuong/chuong3_operator_overloading}
+\input{chuong/chuong4_cai_dat}
+\input{chuong/chuong5_kiem_thu_ket_luan}
+\bibliographystyle{plain}
+\bibliography{references}
+\appendix
+\chapter{Phân công và quy trình Git/Jira}
+Tham khảo danh sách issue trong \texttt{../../JIRA_GIT.md}. Nhóm dùng nhánh theo issue và yêu cầu review trước khi tích hợp.
+\end{document}

@@ -1,0 +1,30 @@
+@startuml CheckInSequence
+actor "Hội viên" as Member
+actor "Lễ tân" as Admin
+participant HethongCRM
+participant HoiVien
+participant TrangThaiThe
+participant CheckIn
+Member -> Admin : quẹt thẻ
+Admin -> HethongCRM : checkIn(maHV)
+HethongCRM -> HethongCRM : timHoiVien(maHV)
+alt không tìm thấy
+  HethongCRM --> Admin : out_of_range
+else tìm thấy
+  HethongCRM -> HoiVien : ++hv (operator++)
+  HoiVien -> TrangThaiThe : duocCheckIn()
+  alt thẻ không ở trạng thái Kích hoạt
+    HoiVien --> Admin : logic_error "the khong kich hoat"
+  else đã quá ngày hết hạn
+    HoiVien -> TrangThaiThe : danhDauHetHan(hv)
+    HoiVien --> Admin : logic_error "the het han"
+  else giới hạn buổi và còn 0 buổi
+    HoiVien --> Admin : logic_error "het so buoi"
+  else hợp lệ
+    HoiVien -> HoiVien : trừ 1 buổi (nếu có giới hạn)
+    HoiVien -> HoiVien : thêm ngày vào lichSuCheckIn_
+    HethongCRM -> CheckIn : tạo bản ghi (mã HV, thời gian)
+    HethongCRM --> Admin : check-in thành công
+  end
+end
+@enduml

@@ -1,0 +1,29 @@
+@startuml TrackingUseCase
+left to right direction
+actor "Hội viên" as Member
+actor "Lễ tân / Admin" as Admin
+rectangle "Fitness CRM - Check-in & InBody" {
+  usecase "Check-in (quẹt thẻ)" as UC1
+  usecase "Kiểm tra trạng thái thẻ" as UC2
+  usecase "Kiểm tra hạn thẻ & số buổi" as UC3
+  usecase "Xem lịch sử check-in" as UC4
+  usecase "Ghi phiếu InBody" as UC5
+  usecase "Xem InBody & BMI" as UC6
+  usecase "So sánh với lần đo trước" as UC7
+}
+Member --> UC1
+Member --> UC4
+Member --> UC6
+Admin --> UC1
+Admin --> UC5
+Admin --> UC4
+UC1 .> UC2 : <<include>>
+UC1 .> UC3 : <<include>>
+UC6 <. UC7 : <<extend>>
+UC5 .> UC6 : <<include>>
+note right of UC5
+  Ràng buộc: cao 50-250 cm, cân 10-300 kg,
+  mỡ 0-100 %, cơ <= cân nặng,
+  ngày đo không ở tương lai
+end note
+@enduml
