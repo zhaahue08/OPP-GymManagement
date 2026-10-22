@@ -1,0 +1,42 @@
+@startuml TrackingClasses
+skinparam classAttributeIconSize 0
+class HoiVien { -lichSuCheckIn_: vector<string>\n+operator++() }
+class CheckIn { -maHoiVien_: string\n-thoiGian_: time_point }
+class LichSuCheckIn {
+  -maHoiVien_: string
+  -ngay_: vector<Date>
+  +tuHoiVien(hv): LichSuCheckIn {static}
+  +themNgay(ngay)
+  +soBuoi(): size_t
+  +soBuoiTrongThang(y, m): size_t
+  +lanCuoi(): Date
+  +operator++()
+  +operator++(int)
+  +operator<<()
+  +operator>>()
+}
+class InBody {
+  -chieuCaoCm_, canNangKg_: double
+  -phanTramMo_, khoiLuongCoKg_: double
+  +bmi(): double
+  +phanLoaiBMI(): string
+  +operator<<()
+  +operator>>()
+}
+class PhieuInBody {
+  -maHoiVien_: string
+  -ngayDo_: Date
+  +bmi(): double
+  +tomTat(): string
+  +operator-(truoc): ChenhLech
+  +operator<(other): bool
+  +operator<<()
+  +operator>>()
+}
+class "PhieuInBody::ChenhLech" as ChenhLech { +canNangKg: double\n+phanTramMo: double\n+khoiLuongCoKg: double }
+HoiVien "1" ..> "1" LichSuCheckIn : tuHoiVien()
+LichSuCheckIn ..> CheckIn : cùng quy ước 1 lượt = 1 buổi
+PhieuInBody *-- "1" InBody : chiSo_
+PhieuInBody ..> ChenhLech : operator-
+HoiVien "1" <.. "0..*" PhieuInBody : maHoiVien
+@enduml
