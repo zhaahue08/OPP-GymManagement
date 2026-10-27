@@ -1,0 +1,9 @@
+ma,ten,loai,so_thang,so_ngay,so_buoi,so_buoi_pt,gia,gia_sv,dang_ban
+"GT01","Gói tập 1 ngày","Theo ngày",0,0,1,0,36000,0,1
+"GT02","Gói tập 1 tháng","Theo tháng",1,0,0,0,339000,240000,1
+"GT03","Gói tập 3 tháng","Theo tháng",3,0,0,0,899000,0,1
+"GT04","Gói tập 6 tháng (5+1)","Theo tháng",6,0,0,0,1499000,0,1
+"GT05","Gói tập 13 tháng (12+1)","Theo tháng",13,0,0,0,2999000,0,1
+"GT06","Gói 12 buổi (trong 60 ngày)","Theo số buổi",0,60,12,0,450000,0,1
+"GT07","1 tháng + 8 buổi PT","Kèm PT",1,0,0,8,2490000,0,1
+"GT08","3 tháng + 24 buổi PT","Kèm PT",3,0,0,24,6490000,0,1
