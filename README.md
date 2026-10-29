@@ -2,17 +2,73 @@
 
 Hệ thống quản lý trung tâm thể hình toàn diện bằng **C++20**: Quản lý hồ sơ hội viên, vòng đời thẻ & gói tập linh hoạt, huấn luyện viên cá nhân (PT) & xếp lịch hẹn không trùng, kiểm soát ra vào (Check-in/out), quản lý tủ đồ, bán lẻ & tồn kho, hóa đơn & công nợ, nhân sự & tính lương đa hình, cơ sở vật chất & vệ sinh, chăm sóc khách hàng (CSKH), phản hồi và báo cáo doanh thu tài chính.
 
-> 💡 **Mẹo xem tài liệu trên GitHub:** Repo này tích hợp sẵn mã nguồn biểu đồ **PlantUML**. Bạn có thể cài đặt tiện ích mở rộng [PlantUML for GitHub](https://github.com/plantuml/plantuml-for-github) trên Chrome / Firefox để GitHub tự động kết xuất trực tiếp các khối mã sơ đồ thành hình ảnh SVG sắc nét ngay trong trang này!
+> 📦 **Hướng dẫn xem biểu đồ UML trên GitHub:**
+> * **Cách 1 (Khuyên dùng - Xem ngay lập tức):** Các biểu đồ bên dưới đã được tích hợp sẵn định dạng **Mermaid**. GitHub tự động vẽ trực tiếp mà không cần cài đặt thêm bất cứ gì!
+> * **Cách 2 (Dành cho bản PlantUML):** Cài đặt tiện ích mở rộng [PlantUML for GitHub trên Chrome Web Store](https://chromewebstore.google.com/detail/plantuml-for-github/lbokhidfopkdehkmlmpaabacljoediic) để trình duyệt tự động render các khối mã `plantuml` thành hình vector sắc nét *(Đã sửa lỗi chữ trắng trên nền trắng khi bật Dark Mode)*.
 
 ---
 
-## 🏛️ Kiến trúc hướng đối tượng & Biểu đồ UML (PlantUML)
+## 🏛️ Kiến trúc hướng đối tượng & Biểu đồ UML
 
 Hệ thống được thiết kế theo chuẩn **UML 2.0**, phân tách rõ ràng giữa tầng giao diện (Console / Win32 / Web), tầng điều phối (`HethongCRM`), tầng miền nghiệp vụ (`Nguoi`, `HoiVien`, `NhanVien`, `PT`, `HoaDon`, `GoiDichVu`) và áp dụng các mẫu thiết kế hướng đối tượng kinh điển (**GoF Design Patterns**).
+
+---
 
 ### 1. Sơ đồ ca sử dụng (Use Case Diagram)
 
 Mô hình hóa các nhóm tác vụ nghiệp vụ gắn liền với 4 tác nhân chính: **Lễ tân**, **Quản lý**, **Huấn luyện viên (PT)** và **Quản trị viên (Admin)**.
+
+#### 🔹 Bản Mermaid (Tự động hiển thị trên GitHub)
+
+```mermaid
+flowchart LR
+    LT["💁 Lễ tân"]
+    QL["💼 Quản lý"]
+    PT["🏋️ Huấn luyện viên (PT)"]
+    AD["🛡️ Quản trị viên"]
+
+    subgraph CoreSystem["Hệ thống Fitness CRM"]
+        UC1(["UC01: Quản lý hội viên"])
+        UC2(["UC02: Đăng ký & Gia hạn gói"])
+        UC3(["UC03: Check-in & Cửa ra vào"])
+        UC4(["UC04: Đặt lịch tập PT"])
+        UC5(["UC05: Ghi nhận ca dạy PT"])
+        UC6(["UC06: Thu ngân & Bán lẻ"])
+        UC7(["UC07: Báo cáo tài chính"])
+        UC8(["UC08: Quản lý thiết bị gym"])
+        UC9(["UC09: Quản trị tài khoản"])
+        UC10(["UC10: Lưu & Nạp CSV"])
+        
+        UC_Strat(["Tính phí theo Strategy"]):::pattern
+        UC_State(["Kiểm tra thẻ theo State"]):::pattern
+    end
+
+    LT --> UC1
+    LT --> UC2
+    LT --> UC3
+    LT --> UC4
+    LT --> UC6
+    LT --> UC10
+
+    PT --> UC4
+    PT --> UC5
+
+    QL --> UC1
+    QL --> UC6
+    QL --> UC7
+    QL --> UC8
+    QL --> UC10
+
+    AD --> UC9
+    AD --> UC10
+
+    UC2 -.->|<<include>>| UC_Strat
+    UC3 -.->|<<include>>| UC_State
+
+    classDef pattern fill:#fef3c7,stroke:#d97706,stroke-dasharray: 5 5,color:#854d0e;
+```
+
+#### 🔹 Bản PlantUML (Đã khắc phục lỗi chữ trắng trên nền trắng)
 
 ```plantuml
 @startuml UseCase_FitnessCRM
@@ -23,6 +79,12 @@ skinparam shadowing true
 skinparam defaultFontName "Segoe UI"
 skinparam defaultFontSize 11
 skinparam defaultFontStyle bold
+
+' Cố định màu chữ tối tương phản cao - không bị lỗi khi GitHub bật Dark Mode
+skinparam defaultFontColor #0F172A
+skinparam actorFontColor #0F172A
+skinparam usecaseFontColor #0F172A
+skinparam arrowFontColor #0F172A
 
 skinparam actor {
     BackgroundColor #EFF6FF
@@ -36,19 +98,19 @@ actor "🏋️ Huấn luyện viên (PT)" as PT
 actor "🛡️ Quản trị viên" as AD
 
 rectangle "Hệ thống Quản lý Fitness CRM" #F8FAFC {
-    usecase "UC01: Quản lý hồ sơ hội viên" as UC1 #EFF6FF;line:2563EB
-    usecase "UC02: Đăng ký & Gia hạn gói tập" as UC2 #EFF6FF;line:2563EB
-    usecase "UC03: Check-in & Cửa ra vào" as UC3 #ECFDF5;line:059669
-    usecase "UC04: Đặt & Điều phối lịch PT" as UC4 #EFF6FF;line:2563EB
-    usecase "UC05: Ghi nhận ca dạy & Hoa hồng" as UC5 #FDF2F8;line:DB2777
-    usecase "UC06: Bán lẻ & Thu ngân quầy" as UC6 #FFFBEB;line:D97706
-    usecase "UC07: Báo cáo tài chính & Thống kê" as UC7 #FAF5FF;line:7C3AED
-    usecase "UC08: Quản lý thiết bị gym & Vệ sinh" as UC8 #FAF5FF;line:7C3AED
-    usecase "UC09: Quản trị tài khoản & Phân quyền" as UC9 #FEE2E2;line:DC2626
-    usecase "UC10: Sao lưu & Nạp dữ liệu CSV" as UC10 #F1F5F9;line:475569
+    usecase "UC01: Quản lý hồ sơ hội viên" as UC1 #EFF6FF;line:2563EB;text:0F172A
+    usecase "UC02: Đăng ký & Gia hạn gói tập" as UC2 #EFF6FF;line:2563EB;text:0F172A
+    usecase "UC03: Check-in & Cửa ra vào" as UC3 #ECFDF5;line:059669;text:065F46
+    usecase "UC04: Đặt & Điều phối lịch PT" as UC4 #EFF6FF;line:2563EB;text:0F172A
+    usecase "UC05: Ghi nhận ca dạy & Hoa hồng" as UC5 #FDF2F8;line:DB2777;text:831843
+    usecase "UC06: Bán lẻ & Thu ngân quầy" as UC6 #FFFBEB;line:D97706;text:78350F
+    usecase "UC07: Báo cáo tài chính & Thống kê" as UC7 #FAF5FF;line:7C3AED;text:4C1D95
+    usecase "UC08: Quản lý thiết bị gym & Vệ sinh" as UC8 #FAF5FF;line:7C3AED;text:4C1D95
+    usecase "UC09: Quản trị tài khoản & Phân quyền" as UC9 #FEE2E2;line:DC2626;text:7F1D1D
+    usecase "UC10: Sao lưu & Nạp dữ liệu CSV" as UC10 #F1F5F9;line:475569;text:0F172A
 
-    usecase "Tính phí theo Strategy" as UC_Strat #FEF9C3;line:CA8A04
-    usecase "Kiểm tra thẻ theo State" as UC_State #D1FAE5;line:059669
+    usecase "Tính phí theo Strategy" as UC_Strat #FEF9C3;line:CA8A04;text:854D0E
+    usecase "Kiểm tra thẻ theo State" as UC_State #D1FAE5;line:059669;text:065F46
 }
 
 LT --> UC1
@@ -85,6 +147,75 @@ Sơ đồ mô tả đầy đủ:
 * **Strategy Pattern**: `ChienLuocGia` (`GiaTieuChuan`, `GiaTheoHangThanhVien`) tách rời thuật toán tính phí khỏi `GoiDichVu`.
 * **Hợp thành (`Composition`) & Thu nạp (`Aggregation`)**: `HoaDon` *-- `DongHang`, `HethongCRM` o-- các thực thể nghiệp vụ.
 
+#### 🔹 Bản Mermaid (Tự động hiển thị trên GitHub)
+
+```mermaid
+classDiagram
+    class Nguoi {
+        <<abstract>>
+        #string ma_
+        #string ten_
+        +vaiTro()* string
+    }
+    class HoiVien {
+        -string sdt_
+        -Date ngayHetHan_
+        -int soBuoiConLai_
+        -string hang_
+        +duocCheckIn() bool
+        +kichHoat(hetHan, soBuoi) void
+        +baoLuu(tuNgay) void
+    }
+    class NhanVien {
+        #string chucVu_
+        #double luongCoBan_
+        +tinhLuong(ky) double*
+    }
+    class PT {
+        -string chuyenMon_
+        -double donGiaBuoi_
+        +ghiNhanBuoiDay() void
+        +tinhLuong(ky) double
+    }
+    class TrangThaiThe {
+        <<interface>>
+        +duocCheckIn() bool*
+        +kichHoat(hv)* void
+        +dongBang(hv)* void
+    }
+    class ChienLuocGia {
+        <<interface>>
+        +tinhPhiDichVu(hv, goi, voucher)* double
+    }
+    class GoiDichVu {
+        -string ma_
+        -double gia_
+        +tinhPhiDichVu() double
+    }
+    class HoaDon {
+        -string ma_
+        -double daThanhToan_
+        +themHang() void
+    }
+    class HethongCRM {
+        -map~string, shared_ptr~HoiVien~~ hoiViens_
+        -unique_ptr~ChienLuocGia~ chienLuocGia_
+        +dangKyGoi() KetQuaDangKy
+        +checkIn() void
+    }
+
+    Nguoi <|-- HoiVien
+    Nguoi <|-- NhanVien
+    NhanVien <|-- PT
+    HoiVien o-- TrangThaiThe : State Pattern
+    HethongCRM o-- HoiVien
+    HethongCRM *-- ChienLuocGia : Strategy Pattern
+    HethongCRM *-- HoaDon
+    GoiDichVu ..> ChienLuocGia
+```
+
+#### 🔹 Bản PlantUML (Đã ép màu chữ đậm chuẩn)
+
 ```plantuml
 @startuml ClassDiagram_FitnessCRM
 skinparam roundCorner 12
@@ -93,6 +224,11 @@ skinparam defaultFontName "Segoe UI"
 skinparam defaultFontSize 11
 skinparam defaultFontStyle bold
 skinparam linetype ortho
+
+skinparam defaultFontColor #0F172A
+skinparam classFontColor #0F172A
+skinparam classAttributeFontColor #0F172A
+skinparam arrowFontColor #0F172A
 
 skinparam class<<Abstract>> {
     BackgroundColor #F8FAFC
@@ -302,7 +438,35 @@ HethongCRM *-- "*" CheckIn
 ### 3. Biểu đồ tuần tự (Sequence Diagrams)
 
 #### Luồng 1: Đăng ký gói tập, tính giá động (Strategy) & Xuất hóa đơn
-Minh họa luồng thông điệp khi nhân viên quầy thực hiện đăng ký dịch vụ:
+
+##### 🔹 Bản Mermaid (Tự động hiển thị trên GitHub)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Staff as 💁 Nhân viên
+    participant UI as 💻 MenuConsole
+    participant CRM as ⚙️ HethongCRM
+    participant HV as 👤 HoiVien
+    participant Goi as 📦 GoiDichVu
+    participant Strat as 🎯 ChienLuocGia
+    participant HD as 🧾 HoaDon
+
+    Staff->>UI: Chọn Đăng ký gói (maHV, maGoi, maKM, daTra)
+    UI->>CRM: dangKyGoi(...)
+    CRM->>Goi: tinhNgayHetHan(today())
+    Goi-->>CRM: denNgay (Date)
+    CRM->>Goi: tinhPhiDichVu(hv, *strategy, voucher)
+    Goi->>Strat: tinhPhiDichVu(...)
+    Strat-->>Goi: phiCuoiCung (809.100 đ)
+    Goi-->>CRM: phiCuoiCung
+    CRM->>HV: kichHoat(denNgay, soBuoi)
+    CRM->>HD: HoaDon(...) & themHang(...)
+    CRM-->>UI: KetQuaDangKy (maHD, phi)
+    UI-->>Staff: In hóa đơn thành công
+```
+
+##### 🔹 Bản PlantUML
 
 ```plantuml
 @startuml Sequence_DangKyGoi
@@ -312,6 +476,10 @@ skinparam shadowing true
 skinparam defaultFontName "Segoe UI"
 skinparam defaultFontSize 11
 skinparam defaultFontStyle bold
+
+skinparam defaultFontColor #0F172A
+skinparam sequenceFontColor #0F172A
+skinparam noteFontColor #0F172A
 
 actor "💁 Lễ tân" as Staff #EFF6FF;line:2563EB
 participant "💻 MenuConsole" as UI #FFE4E6;line:F43F5E
@@ -332,8 +500,8 @@ CRM -> Goi: tinhNgayHetHan(today())
 Goi --> CRM: denNgay (Date)
 
 note over Goi, Strat #ECFDF5
-  <b>Strategy Pattern:</b>
-  Tính giá theo đối tượng (sinh viên/hạng thẻ) và áp dụng voucher
+  <color:#065F46><b>Strategy Pattern:</b></color>
+  <color:#0F172A>Tính giá theo đối tượng và áp dụng voucher</color>
 end note
 
 CRM -> Goi: tinhPhiDichVu(hv, *chienLuocGia_, voucher)
@@ -346,8 +514,8 @@ Goi --> CRM: phiCuoiCung
 deactivate Goi
 
 note over CRM, HV #EFF6FF
-  <b>State Pattern:</b>
-  Cập nhật trạng thái thẻ sang Kích hoạt
+  <color:#1E40AF><b>State Pattern:</b></color>
+  <color:#0F172A>Cập nhật trạng thái thẻ sang Kích hoạt</color>
 end note
 
 CRM -> HV: kichHoat(denNgay, soBuoi, gioiHan)
@@ -370,8 +538,40 @@ deactivate UI
 @enduml
 ```
 
+---
+
 #### Luồng 2: Check-in cửa phòng tập (State Pattern & Kiểm soát lượt)
-Minh họa cơ chế từ chối khi thẻ bảo lưu/hết hạn và trừ buổi khi thẻ hợp lệ:
+
+##### 🔹 Bản Mermaid (Tự động hiển thị trên GitHub)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Staff as 💁 Quẹt thẻ / Cổng vào
+    participant UI as 💻 MenuConsole
+    participant CRM as ⚙️ HethongCRM
+    participant HV as 👤 HoiVien
+    participant State as 💳 TrangThaiThe
+    participant CI as 🚪 CheckIn
+
+    Staff->>UI: Quẹt thẻ (maHV)
+    UI->>CRM: checkIn(maHV)
+    CRM->>CRM: luotDangMo(maHV)
+    alt Đang trong phòng tập
+        CRM-->>UI: Lỗi: Hội viên chưa Check-out lượt cũ
+    else Thẻ hợp lệ
+        CRM->>HV: duocCheckIn()
+        HV->>State: duocCheckIn()
+        State-->>HV: true
+        HV-->>CRM: Cho phép
+        CRM->>HV: operator++() (trừ buổi & lưu lịch sử)
+        CRM->>CI: CheckIn(now())
+        CRM-->>UI: Thành công
+        UI-->>Staff: Mở cửa cho hội viên vào
+    end
+```
+
+##### 🔹 Bản PlantUML
 
 ```plantuml
 @startuml Sequence_CheckIn
@@ -381,6 +581,9 @@ skinparam shadowing true
 skinparam defaultFontName "Segoe UI"
 skinparam defaultFontSize 11
 skinparam defaultFontStyle bold
+
+skinparam defaultFontColor #0F172A
+skinparam sequenceFontColor #0F172A
 
 actor "💁 Lễ tân / Cổng quét" as Staff #EFF6FF;line:2563EB
 participant "💻 MenuConsole" as UI #FFE4E6;line:F43F5E
