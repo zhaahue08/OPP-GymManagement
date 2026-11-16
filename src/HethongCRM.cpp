@@ -245,7 +245,20 @@ const ChienLuocGia& HethongCRM::chienLuocGia() const noexcept { return *chienLuo
 
 // ===== PT & lịch =====
 void HethongCRM::datLich(LichHen item){
-    (void)timHoiVien(item.maHoiVien());(void)timPT(item.maPT());
+    const auto hv = timHoiVien(item.maHoiVien());
+    const auto& pt = timPT(item.maPT());
+    if (!hv->duocCheckIn()) throw std::logic_error("Thẻ hội viên chưa kích hoạt (" + hv->trangThai() + ").");
+    if (!pt.dangLam()) throw std::logic_error("PT đã nghỉ việc.");
+    const auto thoiLuong = item.ketThuc() - item.batDau();
+    if (thoiLuong < std::chrono::minutes{15} || thoiLuong > std::chrono::minutes{240})
+        throw std::invalid_argument("Thời lượng buổi tập từ 15 đến 240 phút.");
+    if (item.batDau() < now()) throw std::logic_error("Không thể đặt lịch trong quá khứ.");
+    if (hv->ngayHetHan().ok() && ngayCua(item.batDau()) > hv->ngayHetHan())
+        throw std::logic_error("Ngày tập vượt quá hạn thẻ của hội viên.");
+    const auto ngayTap = std::chrono::floor<std::chrono::days>(item.batDau());
+    if (item.batDau() < ngayTap + std::chrono::hours{pt.gioBatDau()} ||
+        item.ketThuc() > ngayTap + std::chrono::hours{pt.gioKetThuc()})
+        throw std::logic_error("Ngoài ca làm của PT (" + std::to_string(pt.gioBatDau()) + "h-" + std::to_string(pt.gioKetThuc()) + "h).");
     for(const auto& prior:lichHens_){
         if(prior.ma()==item.ma())throw std::invalid_argument("Mã lịch hẹn đã tồn tại.");
         if(item.trungLich(prior))throw std::logic_error("PT đã có lịch trong khoảng giờ này ("+prior.ma()+").");
@@ -254,14 +267,8 @@ void HethongCRM::datLich(LichHen item){
     lichHens_.push_back(std::move(item));
 }
 std::string HethongCRM::datLichPT(const std::string& maHV, const std::string& maPT, DateTime batDau, int soPhut, const std::string& ghiChu) {
-    auto hv = timHoiVien(maHV); auto& pt = timPT(maPT);
-    if (!hv->duocCheckIn()) throw std::logic_error("Thẻ hội viên chưa kích hoạt (" + hv->trangThai() + ").");
-    if (!pt.dangLam()) throw std::logic_error("PT đã nghỉ việc.");
+    // Kiểm tra trước khi cộng thời lượng; các quy tắc chung nằm ở datLich.
     if (soPhut < 15 || soPhut > 240) throw std::invalid_argument("Thời lượng buổi tập từ 15 đến 240 phút.");
-    if (batDau < now()) throw std::logic_error("Không thể đặt lịch trong quá khứ.");
-    if (hv->ngayHetHan().ok() && ngayCua(batDau) > hv->ngayHetHan()) throw std::logic_error("Ngày tập vượt quá hạn thẻ của hội viên.");
-    const int start = static_cast<int>(std::chrono::duration_cast<std::chrono::minutes>(batDau - std::chrono::floor<std::chrono::days>(batDau)).count());
-    if (!pt.trongCaLam(start, start + soPhut)) throw std::logic_error("Ngoài ca làm của PT (" + std::to_string(pt.gioBatDau()) + "h-" + std::to_string(pt.gioKetThuc()) + "h).");
     LichHen lich(sinhMa("LH"), maHV, maPT, batDau, batDau + std::chrono::minutes{soPhut});
     if (!ghiChu.empty()) lich.napTrangThai("Đã đặt", ghiChu);
     const auto ma = lich.ma();
