@@ -66,6 +66,7 @@ void HoiVien::datNgayThamGia(Date ngay) { if (!ngay.ok()) throw std::invalid_arg
 Date HoiVien::ngayBaoLuu() const noexcept { return ngayBaoLuu_; }
 void HoiVien::baoLuu(Date tuNgay) {
     if (!tuNgay.ok()) throw std::invalid_argument("Ngày bảo lưu không hợp lệ.");
+    if (gioiHanBuoi_ && soBuoiConLai_ == 0) throw std::logic_error("Hội viên đã sử dụng hết số buổi, không thể bảo lưu.");
     trangThai_->dongBang(*this);
     ngayBaoLuu_ = tuNgay;
 }
