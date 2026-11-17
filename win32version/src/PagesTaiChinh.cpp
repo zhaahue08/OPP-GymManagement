@@ -7,14 +7,20 @@ namespace {
 const std::vector<std::wstring> kDanhMucSP{L"Nước uống", L"Thực phẩm bổ sung", L"Đồ ăn kiêng", L"Phụ kiện", L"Trang phục", L"Khác"};
 const std::vector<std::wstring> kDanhMucChi{L"Điện nước", L"Mặt bằng", L"Lương", L"Nhập hàng", L"Bảo trì", L"Marketing", L"Vệ sinh", L"Khác"};
 double tongGio() { double s = 0; for (const auto& [ma, sl] : app().gioHang) s += C().sanPham(ma).giaBan() * sl; return s; }
-int soMonGio() { int s = 0; for (const auto& [ma, sl] : app().gioHang) { (void)ma; s += sl; } return s; }
+long long soMonGio() { long long s = 0; for (const auto& dong : app().gioHang) s += dong.second; return s; }
+int soLuongTrongGio(const std::string& ma) {
+    int tong = 0;
+    for (const auto& [maDong, soLuong] : app().gioHang)
+        if (maDong == ma) tong += soLuong;
+    return tong;
+}
 void themVaoGio(const std::string& ma, int sl) {
+    if (sl <= 0) throw std::invalid_argument("Số lượng phải lớn hơn 0.");
     const auto& sp = C().sanPham(ma);
     if (!sp.dangBan()) throw std::runtime_error(sp.ten() + " đã ngừng bán.");
-    auto it = std::find_if(app().gioHang.begin(), app().gioHang.end(), [&](const auto& p) { return p.first == ma; });
-    const int daCo = it == app().gioHang.end() ? 0 : it->second;
-    if (daCo + sl > sp.tonKho()) throw std::runtime_error("Không đủ hàng: " + sp.ten() + " chỉ còn " + std::to_string(sp.tonKho()) + " " + sp.donVi() + ".");
-    if (it == app().gioHang.end()) app().gioHang.emplace_back(ma, sl); else it->second += sl;
+    const int coTheThem = std::max(0, sp.tonKho() - soLuongTrongGio(ma));
+    if (sl > coTheThem) throw std::runtime_error("Chỉ có thể thêm " + std::to_string(coTheThem) + " " + sp.donVi() + " " + sp.ten() + " theo tồn kho hiện tại.");
+    app().gioHang.emplace_back(ma, sl);
 }
 void formSanPham(const crm::SanPham* sp) {
     std::vector<Truong> f{
@@ -62,18 +68,23 @@ void themTrangTaiChinh(std::vector<Trang>& ds) {
         t.boLoc = {L"Sản phẩm đang bán", L"Giỏ hàng"};
         t.phuDe = [](int) { return L"Bán nước uống, thực phẩm bổ sung, đồ ăn kiêng... Nhấp đúp sản phẩm để thêm 1 vào giỏ. Giỏ hiện có " + std::to_wstring(soMonGio()) + L" món · " + tien(tongGio()) + L" đ."; };
         t.cot = [](int f) -> std::vector<Cot> {
-            if (f == 1) return {{L"Mã SP", 80}, {L"Sản phẩm", 260}, {L"Số lượng", 90, true}, {L"Đơn giá", 110, true}, {L"Thành tiền", 130, true}};
+            if (f == 1) return {{L"Dòng", 60, true}, {L"Mã SP", 80}, {L"Sản phẩm", 220}, {L"Số lượng", 90, true}, {L"Đơn giá", 110, true}, {L"Thành tiền", 130, true}};
             return {{L"Mã SP", 80}, {L"Sản phẩm", 260}, {L"Danh mục", 150}, {L"Đơn vị", 80}, {L"Giá bán", 110, true}, {L"Tồn kho", 90, true}, {L"Trong giỏ", 90, true}};
         };
         t.dong = [](int f) {
             std::vector<Dong> out;
             if (f == 1) {
-                for (const auto& [ma, sl] : app().gioHang) { const auto& sp = C().sanPham(ma); out.push_back({W(ma), W(sp.ten()), std::to_wstring(sl), tien(sp.giaBan()), tien(sp.giaBan() * sl)}); }
+                const auto& gio = app().gioHang;
+                for (std::size_t i = 0; i < gio.size(); ++i) {
+                    const auto& [ma, sl] = gio[i];
+                    const auto& sp = C().sanPham(ma);
+                    out.push_back({std::to_wstring(i + 1), W(ma), W(sp.ten()), std::to_wstring(sl), tien(sp.giaBan()), tien(sp.giaBan() * sl)});
+                }
                 return out;
             }
             for (const auto& [ma, sp] : C().sanPhams()) {
                 if (!sp.dangBan()) continue;
-                int gio = 0; for (const auto& [m, sl] : app().gioHang) if (m == ma) gio = sl;
+                const int gio = soLuongTrongGio(ma);
                 out.push_back({W(ma), W(sp.ten()), W(sp.danhMuc()), W(sp.donVi()), tien(sp.giaBan()), std::to_wstring(sp.tonKho()), gio ? std::to_wstring(gio) : L""});
             }
             return out;
@@ -82,7 +93,7 @@ void themTrangTaiChinh(std::vector<Trang>& ds) {
         t.chieuCaoVe = [](int) { return 96; };
         t.ve = [](HDC dc, RECT c, int) {
             const int gap = S(14), w3 = (c.right - 2 * gap) / 3, h = S(88);
-            veKPI(dc, {0, 0, w3, h}, L"GIỎ HÀNG", std::to_wstring(soMonGio()) + L" món", std::to_wstring(app().gioHang.size()) + L" mặt hàng", mau::chinh, mau::chinhNhat);
+            veKPI(dc, {0, 0, w3, h}, L"GIỎ HÀNG", std::to_wstring(soMonGio()) + L" món", std::to_wstring(app().gioHang.size()) + L" dòng hàng", mau::chinh, mau::chinhNhat);
             veKPI(dc, {w3 + gap, 0, 2 * w3 + gap, h}, L"TẠM TÍNH", tien(tongGio()) + L" đ", L"Chưa gồm giảm giá", mau::xanh, mau::xanhNhat);
             double hn = 0; int n = 0; const auto d = crm::formatDate(crm::today());
             for (const auto& hd : C().hoaDons()) if (hd.loai() == "Bán lẻ" && hd.ngay() == d) { hn += hd.tongTien(); ++n; }
@@ -93,14 +104,14 @@ void themTrangTaiChinh(std::vector<Trang>& ds) {
             {L"＋ Thêm vào giỏ", [] {
                 const auto ma = chon(); const auto& sp = C().sanPham(ma);
                 std::vector<Truong> f{{L"Sản phẩm", Kieu::ChiDoc, W(ma) + L" — " + W(sp.ten()) + L" · " + tien(sp.giaBan()) + L" đ"}, {L"Số lượng", Kieu::So, L"1", {}, true}};
-                if (moForm(app().chinh, L"Thêm vào giỏ", f, [&](const KetQua& k) { if (k.soNguyen(1) <= 0) throw std::runtime_error("Số lượng phải lớn hơn 0."); themVaoGio(ma, k.soNguyen(1)); }, L"Thêm")) lamMoi();
+                if (moForm(app().chinh, L"Thêm vào giỏ", f, [&](const KetQua& k) { themVaoGio(ma, k.soNguyen(1)); }, L"Thêm")) lamMoi();
             }, {0}},
             {L"Bớt khỏi giỏ", [] {
-                const auto ma = chon();
+                const auto dong = std::stoull(chon());
                 auto& g = app().gioHang;
-                auto it = std::find_if(g.begin(), g.end(), [&](const auto& p) { return p.first == ma; });
-                if (it == g.end()) throw std::runtime_error("Sản phẩm không có trong giỏ.");
-                if (--it->second <= 0) g.erase(it);
+                if (dong == 0 || dong > g.size()) throw std::runtime_error("Dòng hàng không còn trong giỏ.");
+                auto it = g.begin() + static_cast<std::ptrdiff_t>(dong - 1);
+                if (--it->second == 0) g.erase(it);
                 lamMoi();
             }, {1}},
             {L"Xóa giỏ", [] { if (!app().gioHang.empty() && hoi(L"Xóa toàn bộ giỏ hàng?")) { app().gioHang.clear(); lamMoi(); } }},
@@ -116,7 +127,9 @@ void themTrangTaiChinh(std::vector<Trang>& ds) {
                 std::string ma;
                 if (moForm(app().chinh, L"Thanh toán", f, [&](const KetQua& k) {
                     const auto kh = k.ma(1);
-                    ma = C().banLe(kh == crm::KHACH_LE ? std::string{} : kh, app().gioHang, k.so(2), k.rong(4) ? -1 : k.so(4), k.chu(3), k.chon(5) <= 0 ? std::string{} : k.ma(5));
+                    const double daTra = k.rong(4) ? -1 : k.so(4);
+                    if (!k.rong(4) && daTra < 0) throw std::invalid_argument("Số tiền khách trả không được âm.");
+                    ma = C().banLe(kh == crm::KHACH_LE ? std::string{} : kh, app().gioHang, k.so(2), daTra, k.chu(3), k.chon(5) <= 0 ? std::string{} : k.ma(5));
                 }, L"Thanh toán")) {
                     app().gioHang.clear(); daThayDoi();
                     xemHD(ma);
