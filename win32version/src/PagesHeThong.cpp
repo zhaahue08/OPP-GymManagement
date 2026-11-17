@@ -21,7 +21,10 @@ const std::map<std::string, std::pair<std::wstring, std::string>>& moTaCaiDat() 
 std::wstring quyenMoTa(crm::VaiTro v) {
     switch (v) {
         case crm::VaiTro::Admin: return L"Toàn quyền, quản lý tài khoản & cài đặt";
-       
+         case crm::VaiTro::QuanLy: return L"Mọi nghiệp vụ, báo cáo, nhân sự, lương";
+        case crm::VaiTro::LeTan: return L"Hội viên, check-in, POS, kho, tủ đồ, CSKH";
+        case crm::VaiTro::Sale: return L"Hội viên, gói tập & KM, POS, CSKH, báo cáo";
+        case crm::VaiTro::PT: return L"Lịch PT của mình, hội viên, chấm công";
     }
     return L"";
 }
