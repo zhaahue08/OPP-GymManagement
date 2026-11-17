@@ -97,7 +97,38 @@ std::wstring gonTien(double v) {
     else swprintf(buf, 32, L"%.0f", v);
     return buf;
 }
-tObject(dc, ob); SelectObject(dc, op); DeleteObject(b); DeleteObject(none);
+}
+void veBieuDoCot(HDC dc, RECT r, const std::wstring& tieuDe, const std::vector<std::wstring>& nhan, const std::vector<double>& giaTri, COLORREF c, bool laTien) {
+    veKhung(dc, r, mau::the, mau::vien, S(14));
+    veChu(dc, {r.left + S(18), r.top + S(10), r.right - S(18), r.top + S(34)}, tieuDe, font(13, true), mau::chu);
+    RECT plot{r.left + S(52), r.top + S(46), r.right - S(18), r.bottom - S(34)};
+    if (plot.right - plot.left < S(40) || plot.bottom - plot.top < S(30)) return;
+    double maxV = 0; for (double v : giaTri) maxV = std::max(maxV, v);
+    if (giaTri.empty() || maxV <= 0) { veChu(dc, plot, L"Chưa có dữ liệu", font(13), mau::xam, DT_CENTER | DT_VCENTER | DT_SINGLELINE); return; }
+    HPEN grid = CreatePen(PS_SOLID, 1, mau::vien); auto op = SelectObject(dc, grid);
+    for (int i = 0; i <= 4; ++i) {
+        const int y = plot.bottom - (plot.bottom - plot.top) * i / 4;
+        MoveToEx(dc, plot.left, y, nullptr); LineTo(dc, plot.right, y);
+        const double v = maxV * i / 4;
+        veChu(dc, {r.left + S(4), y - S(8), plot.left - S(6), y + S(8)}, laTien ? gonTien(v) : W(std::to_string(static_cast<long long>(std::llround(v)))), font(10), mau::phu, DT_RIGHT | DT_VCENTER | DT_SINGLELINE);
+    }
+    SelectObject(dc, op); DeleteObject(grid);
+    const int n = static_cast<int>(giaTri.size());
+    const double slot = double(plot.right - plot.left) / n;
+    const int barW = std::max(S(4), std::min(S(46), static_cast<int>(slot * 0.62)));
+    HBRUSH b = CreateSolidBrush(c); HPEN none = CreatePen(PS_NULL, 0, 0);
+    auto ob = SelectObject(dc, b); op = SelectObject(dc, none);
+    const int labelStep = std::max(1, static_cast<int>(std::ceil(S(44) / slot)));
+    for (int i = 0; i < n; ++i) {
+        const int cx = plot.left + static_cast<int>(slot * i + slot / 2);
+        const int h = static_cast<int>((plot.bottom - plot.top) * giaTri[static_cast<std::size_t>(i)] / maxV);
+        if (h > 0) RoundRect(dc, cx - barW / 2, plot.bottom - h, cx + barW / 2, plot.bottom + S(3), S(6), S(6));
+        if (slot >= S(30) && giaTri[static_cast<std::size_t>(i)] > 0)
+            veChu(dc, {cx - S(40), plot.bottom - h - S(17), cx + S(40), plot.bottom - h - S(1)}, laTien ? gonTien(giaTri[static_cast<std::size_t>(i)]) : W(std::to_string(static_cast<long long>(std::llround(giaTri[static_cast<std::size_t>(i)])))), font(10, true), mau::chu, DT_CENTER | DT_BOTTOM | DT_SINGLELINE);
+        if (i % labelStep == 0 && static_cast<std::size_t>(i) < nhan.size())
+            veChu(dc, {cx - static_cast<int>(slot * labelStep / 2), plot.bottom + S(6), cx + static_cast<int>(slot * labelStep / 2), r.bottom - S(8)}, nhan[static_cast<std::size_t>(i)], font(10), mau::phu, DT_CENTER | DT_TOP | DT_SINGLELINE | DT_END_ELLIPSIS);
+    }
+    SelectObject(dc, ob); SelectObject(dc, op); DeleteObject(b); DeleteObject(none);
 }
 
 // ===== KetQua =====
