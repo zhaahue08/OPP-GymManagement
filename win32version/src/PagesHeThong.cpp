@@ -7,7 +7,14 @@ namespace {
 const std::vector<std::wstring> kVaiTro{L"Quản trị", L"Quản lý", L"Lễ tân", L"Sale", L"Huấn luyện viên"};
 const std::map<std::string, std::pair<std::wstring, std::string>>& moTaCaiDat() {
     static const std::map<std::string, std::pair<std::wstring, std::string>> m{
-      
+        {"ten_phong_tap", {L"Tên phòng tập (in trên hóa đơn)", "Fitness CRM"}},
+        {"dia_chi", {L"Địa chỉ", ""}},
+        {"hotline", {L"Hotline", ""}},
+        {"cong_chuan", {L"Số ngày công chuẩn / tháng", "26"}},
+        {"gia_thue_tu", {L"Giá thuê tủ đồ / tháng (đ)", "100000"}},
+        {"phi_chuyen_nhuong", {L"Phí chuyển nhượng gói mặc định (đ)", "200000"}},
+        {"qua_sinh_nhat_phan_tram", {L"Voucher sinh nhật mặc định (%)", "20"}},
+        {"uu_dai_theo_hang", {L"Ưu đãi theo hạng thành viên (1 = bật)", "0"}},
     };
     return m;
 }
