@@ -63,14 +63,7 @@ void formHoiVien(const crm::HoiVien* hv) {
     std::vector<Truong> f{
         {L"Mã hội viên", hv ? Kieu::ChiDoc : Kieu::Chu, hv ? W(hv->ma()) : W(C().sinhMa("HV")), {}, true},
         {L"Họ và tên", Kieu::Chu, hv ? W(hv->ten()) : L"", {}, true},
-        {L"Số điện thoại", Kieu::Chu, hv ? W(hv->sdt()) : L"", {}, true, L"VD: 0901234567"},
-        {L"Ngày sinh", Kieu::Ngay, hv ? W(crm::formatDate(hv->ngaySinh())) : L"2000-01-01", {}, true},
-        {L"Giới tính", Kieu::Chon, hv ? W(hv->gioiTinh()) : L"Nam", kGioiTinh},
-        {L"Nghề nghiệp", Kieu::ChonSua, hv ? W(hv->ngheNghiep()) : L"", kNghe},
-        {L"Email", Kieu::Chu, hv ? W(hv->email()) : L"", {}, false, L"ten@email.com"},
-        {L"Sinh viên (giá ưu đãi)", Kieu::Check, hv && hv->laSinhVien() ? L"1" : L"0"},
-        {L"Loại thẻ", Kieu::Chon, hv && !hv->loaiThe().empty() ? W(hv->loaiThe()) : loaiThe[0], loaiThe},
-        {L"Mã thẻ / mã vạch", Kieu::Chu, hv ? W(hv->maThe()) : L"", {}, false, L"Quét hoặc nhập mã thẻ"},
+       
         {L"Ghi chú", Kieu::NhieuDong, hv ? W(hv->ghiChu()) : L""},
     };
     std::string ma;
