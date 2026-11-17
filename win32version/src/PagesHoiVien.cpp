@@ -193,6 +193,8 @@ void themTrangHoiVien(std::vector<Trang>& ds) {
             {L"Đăng ký / Gia hạn", [] { moDangKyGoi(chon()); }},
             {L"Bảo lưu", [] {
                 auto hv = hvChon();
+                if (hv->gioiHanBuoi() && hv->soBuoiConLai() == 0)
+                    throw std::logic_error("Hội viên đã sử dụng hết số buổi, không thể bảo lưu.");
                 if (!hoi(L"Bảo lưu thẻ của " + W(hv->ten()) + L" từ hôm nay?\nKhi mở bảo lưu, số ngày đã bảo lưu được cộng bù vào hạn thẻ; lịch PT sắp tới sẽ bị hủy.")) return;
                 C().baoLuu(hv->ma()); daThayDoi();
             }},
