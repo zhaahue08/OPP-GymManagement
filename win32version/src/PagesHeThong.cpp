@@ -18,6 +18,7 @@ const std::map<std::string, std::pair<std::wstring, std::string>>& moTaCaiDat() 
     };
     return m;
 }
+//Vai trò của từng tài khoản
 std::wstring quyenMoTa(crm::VaiTro v) {
     switch (v) {
         case crm::VaiTro::Admin: return L"Toàn quyền, quản lý tài khoản & cài đặt";
