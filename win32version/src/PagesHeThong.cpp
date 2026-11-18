@@ -21,10 +21,15 @@ const std::map<std::string, std::pair<std::wstring, std::string>>& moTaCaiDat() 
 //Vai trò của từng tài khoản
 std::wstring quyenMoTa(crm::VaiTro v) {
     switch (v) {
+        //Quản lý cao nhất
         case crm::VaiTro::Admin: return L"Toàn quyền, quản lý tài khoản & cài đặt";
-         case crm::VaiTro::QuanLy: return L"Mọi nghiệp vụ, báo cáo, nhân sự, lương";
+        //Quản lý nhân sự
+        case crm::VaiTro::QuanLy: return L"Mọi nghiệp vụ, báo cáo, nhân sự, lương";
+        //Lễ tân gym
         case crm::VaiTro::LeTan: return L"Hội viên, check-in, POS, kho, tủ đồ, CSKH";
+        //Sale
         case crm::VaiTro::Sale: return L"Hội viên, gói tập & KM, POS, CSKH, báo cáo";
+        //PT
         case crm::VaiTro::PT: return L"Lịch PT của mình, hội viên, chấm công";
     }
     return L"";
