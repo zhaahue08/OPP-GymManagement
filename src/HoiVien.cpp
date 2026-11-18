@@ -40,12 +40,7 @@ HoiVien HoiVien::operator++(int) {
     ++(*this);
     return previous;
 }
-void HoiVien::capNhatThongTin(std::string ten, std::string sdt, Date ngaySinh, bool sinhVien, std::string gioiTinh, std::string ngheNghiep, std::string email) {
-    if (sdt.empty() || !ngaySinh.ok()) throw std::invalid_argument("Cần số điện thoại và ngày sinh hợp lệ.");
-    if (!email.empty() && email.find('@') == std::string::npos) throw std::invalid_argument("Email không hợp lệ.");
-    doiTen(std::move(ten)); sdt_ = std::move(sdt); ngaySinh_ = ngaySinh; sinhVien_ = sinhVien;
-    gioiTinh_ = std::move(gioiTinh); ngheNghiep_ = std::move(ngheNghiep); email_ = std::move(email);
-}
+
 const std::string& HoiVien::gioiTinh() const noexcept { return gioiTinh_; }
 const std::string& HoiVien::ngheNghiep() const noexcept { return ngheNghiep_; }
 const std::string& HoiVien::email() const noexcept { return email_; }
