@@ -1,11 +1,9 @@
 // Trang Nhân sự và Chấm công & lương.
 #include "App.h"
 #include <set>
-
 namespace gui {
 namespace {
 const std::vector<std::wstring> kChucVu{L"Quản lý", L"Lễ tân", L"Sale", L"Chăm sóc khách hàng", L"Kế toán", L"Bảo vệ", L"Tạp vụ", L"Kỹ thuật"};
-
 void formNhanVien(crm::NhanVien* nv, bool laPT) {
     auto* pt = dynamic_cast<crm::PT*>(nv);
     if (nv) laPT = pt != nullptr;
@@ -74,7 +72,6 @@ void phieuLuong(int f) {
             }
 }
 }
-
 void themTrangNhanSu(std::vector<Trang>& ds) {
     {
         Trang t;
