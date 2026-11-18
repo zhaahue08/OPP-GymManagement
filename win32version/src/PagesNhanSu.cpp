@@ -3,10 +3,12 @@
 #include <set>
 namespace gui {
 namespace {
+
 const std::vector<std::wstring> kChucVu{L"Quản lý", L"Lễ tân", L"Sale", L"Chăm sóc khách hàng", L"Kế toán", L"Bảo vệ", L"Tạp vụ", L"Kỹ thuật"};
 void formNhanVien(crm::NhanVien* nv, bool laPT) {
     auto* pt = dynamic_cast<crm::PT*>(nv);
     if (nv) laPT = pt != nullptr;
+
     std::vector<Truong> f{
         {L"Mã nhân sự", nv ? Kieu::ChiDoc : Kieu::Chu, nv ? W(nv->ma()) : W(C().sinhMa(laPT ? "PT" : "NV")), {}, true},
         {L"Họ và tên", Kieu::Chu, nv ? W(nv->ten()) : L"", {}, true},
@@ -34,12 +36,14 @@ void formNhanVien(crm::NhanVien* nv, bool laPT) {
     })) return;
     daThayDoi();
 }
+
 crm::NhanVien& nvChon() { auto* nv = C().timNhanSu(chon()); if (!nv) throw std::runtime_error("Không tìm thấy nhân sự."); return *nv; }
 std::string maNVMacDinh() {
     if (!app().maNhanVien.empty()) return app().maNhanVien;
     const auto key = chonHoacRong();
     return C().timNhanSu(key) ? key : std::string{};
 }
+
 void chamCong(bool vao) {
     const auto ds = dsNhanSu();
     if (ds.empty()) throw std::runtime_error("Chưa có nhân sự.");
@@ -51,6 +55,7 @@ void chamCong(bool vao) {
         msg = (vao ? L"Đã chấm công VÀO lúc " : L"Đã chấm công RA lúc ") + gio(crm::now()) + L" cho " + tenNhanSu(k.ma(0)) + L".";
     }, vao ? L"Vào ca" : L"Ra ca")) { daThayDoi(); thongBao(msg); }
 }
+
 std::pair<int, unsigned> kyLuong(int f) {
     const auto d = crm::today();
     int y = int(d.year()); unsigned m = unsigned(d.month());
