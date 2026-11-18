@@ -55,17 +55,20 @@ void themTrangHeThong(std::vector<Trang>& ds) {
             out.push_back({W(tk.tenDangNhap()), W(crm::tenVaiTro(tk.vaiTro())), tk.maNhanVien().empty() ? L"" : W(tk.maNhanVien()) + L" " + tenNhanSu(tk.maNhanVien()), quyenMoTa(tk.vaiTro()), tk.khoa() ? L"Đã khóa" : L"Hoạt động"});
         return out;
     };
+
     t.mauChu = [](const Dong& r, int f) -> COLORREF { return f == 0 && r[4] == L"Đã khóa" ? mau::xam : CLR_DEFAULT; };
     auto suaCaiDat = [] {
         const auto key = chon();
         const auto& m = moTaCaiDat();
         auto it = m.find(key);
+
         std::vector<Truong> f{{L"Cài đặt", Kieu::ChiDoc, it == m.end() ? W(key) : it->second.first}, {L"Giá trị", Kieu::Chu, W(C().caiDat(key, it == m.end() ? "" : it->second.second))}};
         if (moForm(app().chinh, L"Sửa cài đặt", f, [&](const KetQua& k) {
             if ((key == "cong_chuan" || key == "gia_thue_tu" || key == "phi_chuyen_nhuong" || key == "qua_sinh_nhat_phan_tram") && (k.rong(1) || docSo(k.wchu(1)) <= 0)) throw std::runtime_error("Giá trị phải là số dương.");
             C().datCaiDat(key, key == "ten_phong_tap" || key == "dia_chi" || key == "hotline" ? k.chu(1) : U(thapPhan(docSo(k.wchu(1)), 0)));
         })) daThayDoi();
     };
+    
     t.moDong = [suaCaiDat](int f) { if (f == 1) suaCaiDat(); };
     t.thaoTac = {
         {L"＋ Thêm tài khoản", [] {
