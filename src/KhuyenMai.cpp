@@ -31,5 +31,14 @@ void KhuyenMai::suDung() {
     if (soLuotConLai_ > 0) --soLuotConLai_;
     ++daDung_;
 }
-
+std::string KhuyenMai::moTa() const {
+    std::ostringstream out;
+    out << "Giảm ";
+    if (giam_.loai() == LoaiGiamGia::PhanTram) out << giam_.giaTri() << '%';
+    else out << std::fixed << std::setprecision(0) << giam_.giaTri() << " VND";
+    if (!maGoi_.empty()) out << " cho gói " << maGoi_;
+    if (chiHoiVienMoi_) out << ", chỉ hội viên mới";
+    if (!maHoiVien_.empty()) out << ", dành riêng " << maHoiVien_;
+    return out.str();
+}
 }
