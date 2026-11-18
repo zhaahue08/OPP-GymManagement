@@ -1,7 +1,6 @@
 // Trang Tài khoản & cài đặt (chỉ quản trị viên).
 #include "App.h"
 #include <map>
-
 namespace gui {
 namespace {
 const std::vector<std::wstring> kVaiTro{L"Quản trị", L"Quản lý", L"Lễ tân", L"Sale", L"Huấn luyện viên"};
@@ -18,6 +17,7 @@ const std::map<std::string, std::pair<std::wstring, std::string>>& moTaCaiDat() 
     };
     return m;
 }
+
 std::wstring quyenMoTa(crm::VaiTro v) {
     switch (v) {
         case crm::VaiTro::Admin: return L"Toàn quyền, quản lý tài khoản & cài đặt";
@@ -29,7 +29,6 @@ std::wstring quyenMoTa(crm::VaiTro v) {
     return L"";
 }
 }
-
 void themTrangHeThong(std::vector<Trang>& ds) {
     Trang t;
     t.ten = L"Tài khoản & cài đặt"; t.bieuTuong = L""; t.quyen = Q_ADMIN;
@@ -97,3 +96,5 @@ void themTrangHeThong(std::vector<Trang>& ds) {
     ds.push_back(std::move(t));
 }
 }
+
+
