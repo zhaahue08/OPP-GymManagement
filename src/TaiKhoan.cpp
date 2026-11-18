@@ -30,6 +30,7 @@ TaiKhoan::TaiKhoan(std::string ten, const std::string& matKhau, VaiTro vaiTro, s
     if (tenDangNhap_.empty() || tenDangNhap_.find_first_of(" ,\"") != std::string::npos) throw std::invalid_argument("Tên đăng nhập không hợp lệ (không chứa khoảng trắng, dấu phẩy).");
     doiMatKhau(matKhau);
 }
+//Dữ liệu tài khoản
 TaiKhoan TaiKhoan::tuDuLieu(std::string ten, std::string muoi, std::string bam, VaiTro vaiTro, std::string maNV, bool khoa) {
     TaiKhoan tk(std::move(ten), "tam-thoi", vaiTro, std::move(maNV));
     if (muoi.empty() || bam.empty()) throw std::invalid_argument("Dữ liệu mật khẩu rỗng.");
