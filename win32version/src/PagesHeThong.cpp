@@ -30,7 +30,7 @@ std::wstring quyenMoTa(crm::VaiTro v) {
     return L"";
 }
 }
-
+//Thêm trang hệ thống mới
 void themTrangHeThong(std::vector<Trang>& ds) {
     Trang t;
     t.ten = L"Tài khoản & cài đặt"; t.bieuTuong = L""; t.quyen = Q_ADMIN;
