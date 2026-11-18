@@ -36,7 +36,14 @@ TaiKhoan TaiKhoan::tuDuLieu(std::string ten, std::string muoi, std::string bam, 
     tk.muoi_ = std::move(muoi); tk.bam_ = std::move(bam); tk.khoa_ = khoa;
     return tk;
 }
-
+std::string TaiKhoan::bamMatKhau(const std::string& matKhau, const std::string& muoi) {
+    std::uint64_t h = 1469598103934665603ULL;
+    const std::string input = muoi + ':' + matKhau;
+    for (int round = 0; round < 5000; ++round)
+        for (unsigned char c : input) { h ^= c; h *= 1099511628211ULL; h ^= static_cast<std::uint64_t>(round); }
+    std::ostringstream out; out << std::hex << std::setw(16) << std::setfill('0') << h;
+    return out.str();
+}
 const std::string& TaiKhoan::tenDangNhap() const noexcept { return tenDangNhap_; } const std::string& TaiKhoan::muoi() const noexcept { return muoi_; }
 const std::string& TaiKhoan::bam() const noexcept { return bam_; } const std::string& TaiKhoan::maNhanVien() const noexcept { return maNhanVien_; }
 VaiTro TaiKhoan::vaiTro() const noexcept { return vaiTro_; } bool TaiKhoan::khoa() const noexcept { return khoa_; }
