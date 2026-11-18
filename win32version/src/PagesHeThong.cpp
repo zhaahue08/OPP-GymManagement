@@ -1,4 +1,3 @@
-// Trang Tài khoản & cài đặt (chỉ quản trị viên).
 #include "App.h"
 #include <map>
 namespace gui {
@@ -17,11 +16,6 @@ const std::map<std::string, std::pair<std::wstring, std::string>>& moTaCaiDat() 
     };
     return m;
 }
-<<<<<<< HEAD
-
-=======
-//Vai trò của từng tài khoản
->>>>>>> 32a5f555dea8531a139fed5011dbfe899248b83d
 std::wstring quyenMoTa(crm::VaiTro v) {
     switch (v) {
         //Quản lý cao nhất
