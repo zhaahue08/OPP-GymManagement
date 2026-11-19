@@ -1,3 +1,6 @@
+// Khai báo dữ liệu do hệ thống quản lý và các phương thức điều phối nghiệp vụ.
+// Các nhóm hàm công khai là điểm gọi từ giao diện. Phần private chứa dữ liệu và bước xử lý dùng chung.
+
 #pragma once
 #include "BanGhi.h"
 #include "CheckIn.h"
@@ -82,6 +85,9 @@ public:
     PT& timPT(const std::string& ma) const;
     void xoaHoiVien(const std::string& ma);
     void ganThe(const std::string& maHV, const std::string& maThe, const std::string& loaiThe);
+    void capNhatHoSoHoiVien(const std::string& maHV, std::string ten, std::string sdt, Date ngaySinh, bool sinhVien,
+                           std::string gioiTinh, std::string ngheNghiep, std::string email,
+                           std::string maThe, std::string loaiThe);
     void phanCongPT(const std::string& maHV, const std::string& maPT);
     void baoLuu(const std::string& maHV);
     int moBaoLuu(const std::string& maHV);
@@ -109,6 +115,7 @@ public:
     const ChienLuocGia& chienLuocGia() const noexcept;
 
     // ===== PT, lịch tập =====
+    // Cả hai đường đặt lịch dùng chung kiểm tra thẻ, thời gian, ca làm và trùng lịch.
     void datLich(LichHen lich);
     std::string datLichPT(const std::string& maHV, const std::string& maPT, DateTime batDau, int soPhut, const std::string& ghiChu = {});
     void hoanThanhLich(const std::string& ma);
@@ -141,6 +148,8 @@ public:
     void thuNo(const std::string& maHoaDon, double soTien, const std::string& phuongThuc);
     const HoaDon& timHoaDon(const std::string& ma) const;
     void ghiNhanChi(GiaoDich chiPhi);
+    // Mỗi tháng có một khoản thuê; nhập 0 để ghi chú không phát sinh tiền thuê.
+    void ghiNhanTienMatBang(Date ngay, double tienThang, const std::string& ghiChu = {});
     void ghiNhanThu(GiaoDich thu);
     void xoaChiPhi(const std::string& ma);
     void themSanPham(SanPham sp);
@@ -215,6 +224,7 @@ public:
     const auto& ghiChuCSKHs() const noexcept { return ghiChuCSKHs_; }
     const auto& taiKhoans() const noexcept { return taiKhoans_; }
     const auto& canhBaoNapDuLieu() const noexcept { return canhBaoNap_; }
+    const auto& caiDats() const noexcept { return caiDat_; }
 
     void luuCSV(const std::filesystem::path& thuMuc) const;
     void docCSV(const std::filesystem::path& thuMuc);

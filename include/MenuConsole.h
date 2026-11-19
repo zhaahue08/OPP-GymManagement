@@ -1,3 +1,6 @@
+// Khai báo lớp giao diện dòng lệnh.
+// crm_ là tham chiếu đến hệ thống do main tạo, vì vậy menu thao tác trên cùng dữ liệu đang được nạp.
+
 #pragma once
 #include "HethongCRM.h"
 #include <string>

@@ -1,3 +1,6 @@
+// Giao diện State và bốn lớp trạng thái cụ thể của thẻ hội viên.
+// Mỗi lớp ghi đè các chuyển đổi được hỗ trợ. Hàm mặc định của lớp cơ sở báo lỗi cho chuyển đổi khác.
+
 #pragma once
 #include <memory>
 #include <string>

@@ -1,3 +1,6 @@
+// Lớp cơ sở trừu tượng cho hệ phân cấp con người.
+// vaiTro() thuần ảo buộc lớp con cung cấp hành vi. Destructor ảo hỗ trợ hủy đối tượng qua con trỏ cơ sở.
+
 #pragma once
 #include <string>
 namespace crm {

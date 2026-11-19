@@ -1,3 +1,6 @@
+// Khai báo dữ liệu hội viên và các hành vi dùng thẻ.
+// Trạng thái thẻ được sở hữu bằng unique_ptr. Các hàm đọc trạng thái chuyển lời gọi tới đối tượng State.
+
 #pragma once
 #include "DateUtils.h"
 #include "Nguoi.h"
@@ -48,6 +51,7 @@ public:
     Date ngayThamGia() const noexcept; void datNgayThamGia(Date ngay);
     // Bảo lưu: ghi nhận ngày bắt đầu, khi mở lại cộng bù số ngày đã bảo lưu vào hạn thẻ.
     Date ngayBaoLuu() const noexcept; void baoLuu(Date tuNgay = today()); int moBaoLuu(Date ngay = today());
+    void napBaoLuu(Date tuNgay);
     int soBuoiPT() const noexcept; void napBuoiPT(int soBuoi); void datSoBuoiPT(int soBuoi); void truBuoiPT();
     std::string lanCheckInCuoi() const;
     int soNgayConLai(Date ngay = today()) const;

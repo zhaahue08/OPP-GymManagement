@@ -1,3 +1,6 @@
+// Gói giữ dữ liệu dịch vụ. Các lớp chiến lược cùng cung cấp giao diện tính phí qua hàm ảo.
+// GoiDichVu nhận chiến lược qua tham chiếu khi tính phí, HethongCRM sở hữu chiến lược được chọn.
+
 #pragma once
 #include "DateUtils.h"
 #include "Voucher.h"
