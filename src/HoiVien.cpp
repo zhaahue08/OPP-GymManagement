@@ -1,3 +1,7 @@
+// Hồ sơ hội viên giữ thông tin cá nhân, quyền sử dụng gói và lịch sử check-in.
+// Các lời gọi kích hoạt hoặc bảo lưu được chuyển đến đối tượng TrangThaiThe đang được sở hữu.
+// Toán tử ++ ghi nhận một lượt dùng thẻ và giảm số buổi của gói có giới hạn.
+
 #include "HoiVien.h"
 #include <algorithm>
 #include <stdexcept>
@@ -21,6 +25,8 @@ void HoiVien::kichHoat(Date hetHan, int soBuoi, bool gioiHanBuoi) { if (!hetHan.
 void HoiVien::dongBang() { baoLuu(); }
 void HoiVien::moBang() { (void)moBaoLuu(); }
 void HoiVien::capNhatHetHan(Date ngay) { if (!ngay.ok()) throw std::invalid_argument("Hạn thẻ không hợp lệ."); ngayHetHan_ = ngay; }
+// Tiền tố kiểm tra trạng thái, hạn thẻ và số buổi trước khi ghi lượt sử dụng.
+// Giá trị trả về là tham chiếu đến chính hội viên sau khi cập nhật.
 HoiVien& HoiVien::operator++() {
     if (!trangThai_->duocCheckIn()) throw std::logic_error("Thẻ hội viên không ở trạng thái kích hoạt (" + trangThai() + ").");
     // Thẻ còn hiệu lực đến hết ngày hết hạn.
@@ -29,6 +35,8 @@ HoiVien& HoiVien::operator++() {
     if (gioiHanBuoi_) --soBuoiConLai_;
     lichSuCheckIn_.push_back(formatDate(today())); return *this;
 }
+// Hậu tố dựng giá trị previous và khôi phục trạng thái riêng của nó trước khi gọi tiền tố.
+// Người gọi nhận dữ liệu trước thao tác, còn đối tượng hiện tại đã được cập nhật.
 HoiVien HoiVien::operator++(int) {
     HoiVien previous(ma(),ten(),sdt_,ngaySinh_,sinhVien_);
     previous.lichSuCheckIn_=lichSuCheckIn_;
@@ -64,12 +72,21 @@ void HoiVien::datGhiChu(std::string ghiChu) { ghiChu_ = std::move(ghiChu); }
 Date HoiVien::ngayThamGia() const noexcept { return ngayThamGia_; }
 void HoiVien::datNgayThamGia(Date ngay) { if (!ngay.ok()) throw std::invalid_argument("Ngày tham gia không hợp lệ."); ngayThamGia_ = ngay; }
 Date HoiVien::ngayBaoLuu() const noexcept { return ngayBaoLuu_; }
+// Đây là một yêu cầu bảo lưu mới, nên phải kiểm tra ngày, số buổi và hạn thẻ.
 void HoiVien::baoLuu(Date tuNgay) {
     if (!tuNgay.ok()) throw std::invalid_argument("Ngày bảo lưu không hợp lệ.");
     if (gioiHanBuoi_ && soBuoiConLai_ == 0) throw std::logic_error("Hội viên đã sử dụng hết số buổi, không thể bảo lưu.");
+    if (ngayHetHan_.ok() && tuNgay > ngayHetHan_) throw std::logic_error("Thẻ hội viên đã hết hạn, không thể bảo lưu.");
     trangThai_->dongBang(*this);
     ngayBaoLuu_ = tuNgay;
 }
+// Khôi phục dữ liệu đã lưu, kể cả hồ sơ cũ còn 0 buổi, để giữ đúng trạng thái và mốc ngày.
+void HoiVien::napBaoLuu(Date tuNgay) {
+    if (!tuNgay.ok()) throw std::invalid_argument("Ngày bảo lưu không hợp lệ.");
+    datTrangThai(taoTrangThaiDongBang());
+    ngayBaoLuu_ = tuNgay;
+}
+// Đổi lại trạng thái kích hoạt, tính số ngày đã bảo lưu và cộng bù vào hạn thẻ.
 int HoiVien::moBaoLuu(Date ngay) {
     trangThai_->moBang(*this);
     int days = 0;
