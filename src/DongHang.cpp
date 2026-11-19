@@ -1,3 +1,6 @@
+// Một dòng hàng gồm tên, số lượng, đơn giá và mã sản phẩm nếu có.
+// Thành tiền bằng số lượng nhân đơn giá. Hàm tạo có tham số từ chối số lượng không dương.
+
 #include "DongHang.h"
 #include <stdexcept>
 #include <utility>

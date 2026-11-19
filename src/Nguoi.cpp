@@ -1,3 +1,6 @@
+// Cài đặt phần dữ liệu dùng chung cho hội viên và nhân viên, gồm mã và họ tên.
+// Nguoi là lớp cơ sở trừu tượng. Lớp con cung cấp vaiTro() theo kiểu người cụ thể.
+
 #include "Nguoi.h"
 #include <stdexcept>
 #include <utility>

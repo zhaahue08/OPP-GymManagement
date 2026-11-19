@@ -1,3 +1,6 @@
+// NhanVien kế thừa Nguoi, bổ sung chức vụ, lương cơ bản và tỷ lệ hoa hồng.
+// tinhLuong() tính phần theo ngày công và hoa hồng doanh số, được PT ghi đè khi cần cộng thu nhập dạy.
+
 #include "NhanVien.h"
 #include <algorithm>
 #include <stdexcept>

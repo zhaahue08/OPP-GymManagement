@@ -1,3 +1,6 @@
+// Một CheckIn biểu diễn một lượt vào phòng và thời điểm ra nếu lượt đó đã kết thúc.
+// Giờ ra có giá trị mặc định khi lượt còn mở. soPhut() dùng giờ ra hoặc thời điểm được truyền vào.
+
 #include "CheckIn.h"
 #include <stdexcept>
 #include <utility>

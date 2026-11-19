@@ -1,3 +1,6 @@
+// KhuyenMai chứa một Voucher cùng điều kiện về ngày, gói, hội viên và lượt sử dụng.
+// HethongCRM kiểm tra điều kiện áp dụng trước khi tính phí và ghi nhận lượt dùng.
+
 #include "KhuyenMai.h"
 #include <iomanip>
 #include <sstream>

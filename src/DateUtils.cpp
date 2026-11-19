@@ -1,3 +1,6 @@
+// Các hàm ngày giờ dùng chrono của C++20 để đọc ngày, cộng thời hạn và so sánh thời điểm.
+// Các nghiệp vụ gói tập, đặt lịch, nhắc gia hạn và báo cáo dùng chung các phép xử lý này.
+
 #include "DateUtils.h"
 #include <algorithm>
 #include <ctime>
@@ -6,6 +9,7 @@
 #include <stdexcept>
 
 namespace crm {
+// Kiểm tra cấu trúc YYYY-MM-DD rồi dùng year_month_day::ok() để kiểm tra ngày thực tế.
 Date parseDate(const std::string& text) {
     int y{}, m{}, d{}; char a{}, b{}; std::istringstream in(text);
     if (!(in >> y >> a >> m >> b >> d) || a != '-' || b != '-' || in.peek() != std::char_traits<char>::eof())
@@ -34,6 +38,7 @@ DateTime now() {
     return std::chrono::sys_days{day} + std::chrono::hours{local.tm_hour} + std::chrono::minutes{local.tm_min} + std::chrono::seconds{local.tm_sec};
 }
 Date today() { return ngayCua(now()); }
+// Khi ngày cũ không tồn tại ở tháng đích, chọn ngày cuối tháng đích.
 Date addMonths(Date date, int months) {
     if (!date.ok() || months < 0) throw std::invalid_argument("Ngày hoặc số tháng không hợp lệ.");
     const Date first{date.year(), date.month(), std::chrono::day{1}};

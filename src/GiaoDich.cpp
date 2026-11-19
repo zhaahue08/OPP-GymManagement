@@ -1,3 +1,6 @@
+// GiaoDich ghi nhận khoản thu hoặc chi với mã, ngày, nội dung, danh mục và số tiền.
+// Console dùng lớp này khi nhập chi phí, sau đó thêm giao dịch vào HethongCRM để tổng hợp.
+
 #include "GiaoDich.h"
 #include <stdexcept>
 #include <utility>

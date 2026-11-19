@@ -1,3 +1,6 @@
+// LichHen giữ mã hội viên, mã huấn luyện viên, thời gian và trạng thái buổi hẹn.
+// Lớp kiểm tra giao nhau giữa hai lịch. HethongCRM duyệt danh sách để chọn các lịch cần so sánh.
+
 #include "LichHen.h"
 #include <stdexcept>
 #include <utility>
@@ -5,6 +8,8 @@ namespace crm {
 LichHen::LichHen(std::string ma,std::string hv,std::string pt,std::chrono::sys_seconds start,std::chrono::sys_seconds end):ma_(std::move(ma)),maHoiVien_(std::move(hv)),maPT_(std::move(pt)),batDau_(start),ketThuc_(end){if(ma_.empty()||maHoiVien_.empty()||maPT_.empty()||end<=start)throw std::invalid_argument("Khung giờ lịch hẹn không hợp lệ.");}
 const std::string& LichHen::ma()const noexcept{return ma_;} const std::string& LichHen::maHoiVien()const noexcept{return maHoiVien_;} const std::string& LichHen::maPT()const noexcept{return maPT_;}
 std::chrono::sys_seconds LichHen::batDau()const noexcept{return batDau_;} std::chrono::sys_seconds LichHen::ketThuc()const noexcept{return ketThuc_;}
+// Hai khoảng giao nhau khi mỗi thời điểm bắt đầu đều nhỏ hơn thời điểm kết thúc của khoảng kia.
+// Dấu nhỏ hơn nghiêm ngặt cho phép hai buổi tiếp giáp tại cùng một thời điểm.
 bool LichHen::trungLich(const LichHen& x)const noexcept{return dangHoatDong()&&x.dangHoatDong()&&maPT_==x.maPT_&&batDau_<x.ketThuc_&&x.batDau_<ketThuc_;}
 bool LichHen::trungLichHoiVien(const LichHen& x)const noexcept{return dangHoatDong()&&x.dangHoatDong()&&maHoiVien_==x.maHoiVien_&&batDau_<x.ketThuc_&&x.batDau_<ketThuc_;}
 int LichHen::thoiLuongPhut()const noexcept{return static_cast<int>(std::chrono::duration_cast<std::chrono::minutes>(ketThuc_-batDau_).count());}

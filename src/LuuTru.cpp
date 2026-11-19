@@ -1,3 +1,7 @@
+// Cài đặt phần lưu và nạp CSV của HethongCRM.
+// luuCSV chuyển dữ liệu trong bộ nhớ thành từng tệp, còn docCSV dựng lại các đối tượng từ tệp.
+// Thông báo nạp lỗi được gom theo dòng để người gọi có thể xem lại sau khi đọc dữ liệu.
+
 // Đọc/ghi toàn bộ dữ liệu HethongCRM ra các file CSV (UTF-8) trong một thư mục.
 #include "HethongCRM.h"
 #include <fstream>
@@ -8,7 +12,10 @@
 
 namespace crm {
 namespace {
+// Bao chuỗi bằng dấu nháy và nhân đôi dấu nháy bên trong để tránh tách nhầm cột.
 std::string csv(const std::string& s) { std::string r="\""; for(char c:s){if(c=='\"')r+='\"';if(c=='\n'||c=='\r')c=' ';r+=c;} return r+'\"'; }
+// Biến quoted phân biệt dấu phẩy trong nội dung với dấu phẩy ngăn cột.
+// Cặp dấu nháy bên trong trường có nháy được đọc thành một ký tự nháy.
 std::vector<std::string> parseCSV(const std::string& line) {
     std::vector<std::string> out; std::string field; bool quoted=false;
     for(std::size_t i=0;i<line.size();++i){char c=line[i];if(quoted){if(c=='\"'&&i+1<line.size()&&line[i+1]=='\"'){field+='\"';++i;}else if(c=='\"')quoted=false;else field+=c;}else if(c=='\"')quoted=true;else if(c==','){out.push_back(field);field.clear();}else field+=c;}
@@ -37,6 +44,7 @@ int soNguyen(const std::string& s, int macDinh = 0) { return s.empty() ? macDinh
 double soThuc(const std::string& s, double macDinh = 0) { return s.empty() ? macDinh : std::stod(s); }
 const std::string& cot(const std::vector<std::string>& c, std::size_t i) { static const std::string rong; return i < c.size() ? c[i] : rong; }
 
+// Mỗi tệp được ghi qua tệp .tmp, đóng và kiểm tra xong mới đổi tên sang tệp đích.
 class TepCSV {
     std::filesystem::path dich_, tam_;
     std::ofstream f_;
@@ -45,6 +53,7 @@ public:
         if (!f_) throw std::runtime_error("Không ghi được " + ten);
         f_ << header << '\n';
     }
+    // Template nhận số lượng tham số khác nhau, chọn cell() theo kiểu dữ liệu rồi ghép bằng dấu phẩy.
     template<class... A> void dong(const A&... a) {
         bool first = true; std::string line;
         ((line += (first ? "" : ","), line += cell(a), first = false), ...);
@@ -56,6 +65,8 @@ public:
         std::filesystem::rename(tam_, dich_); // ghi xong mới thay file cũ, tránh hỏng dữ liệu khi lỗi giữa chừng
     }
 };
+// Đọc từng dòng, bỏ BOM của UTF-8 và ký tự xuống dòng Windows nếu có.
+// Dòng thiếu cột hoặc lỗi chuyển dữ liệu được ghi cảnh báo, vòng đọc tiếp tục với dòng sau.
 bool docTep(const std::filesystem::path& dir, const std::string& ten, std::size_t minCot, std::vector<std::string>& canhBao,
             const std::function<void(const std::vector<std::string>&)>& xuLy, std::vector<std::string>* header = nullptr) {
     const auto path = dir / ten;
@@ -83,6 +94,7 @@ bool docTep(const std::filesystem::path& dir, const std::string& ten, std::size_
 }
 }
 
+// Ghi từng nhóm đối tượng sang tệp riêng. Một hóa đơn nhiều dòng được ghi thành nhiều dòng CSV cùng mã.
 void HethongCRM::luuCSV(const std::filesystem::path& dir) const {
     std::filesystem::create_directories(dir);
     {
@@ -216,6 +228,7 @@ void HethongCRM::luuCSV(const std::filesystem::path& dir) const {
     }
 }
 
+// Dựng lại các đối tượng theo thứ tự nạp trong hàm và giữ cảnh báo trong canhBaoNap_.
 void HethongCRM::docCSV(const std::filesystem::path& dir) {
     xoaDuLieu();
     auto& w = canhBaoNap_;
@@ -252,7 +265,7 @@ void HethongCRM::docCSV(const std::filesystem::path& dir) {
         if (!c[5].empty()) {
             h->kichHoat(parseDate(c[5]), soNguyen(c[6]), c[7] == "1");
             auto state = taoTrangThaiTheoTen(c[8]);
-            if (state->ten() == "Bảo lưu") h->baoLuu(c.size() >= 22 && !c[19].empty() ? parseDate(c[19]) : today());
+            if (state->ten() == "Bảo lưu") h->napBaoLuu(c.size() >= 22 && !c[19].empty() ? parseDate(c[19]) : today());
             else h->datTrangThai(std::move(state));
         }
         if (!c[9].empty()) {

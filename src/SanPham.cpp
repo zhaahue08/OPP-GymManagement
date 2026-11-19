@@ -1,3 +1,6 @@
+// SanPham giữ giá, tồn kho và các thao tác nhập, xuất, kiểm kê.
+// Các hàm kiểm tra điều kiện trước khi cập nhật tồn. PhieuKho lưu thông tin của từng biến động kho.
+
 #include "SanPham.h"
 #include <stdexcept>
 #include <utility>
@@ -18,6 +21,7 @@ double SanPham::giaBan() const noexcept { return giaBan_; } double SanPham::giaN
 int SanPham::tonKho() const noexcept { return tonKho_; } int SanPham::mucToiThieu() const noexcept { return mucToiThieu_; }
 bool SanPham::dangBan() const noexcept { return dangBan_; } void SanPham::datDangBan(bool value) noexcept { dangBan_ = value; }
 bool SanPham::sapHet() const noexcept { return dangBan_ && tonKho_ <= mucToiThieu_; }
+// Gộp giá trị tồn cũ với lô hàng mới để tính lại giá vốn bình quân.
 void SanPham::nhapKho(int soLuong, double donGiaNhap) {
     if (soLuong <= 0 || donGiaNhap < 0) throw std::invalid_argument("Số lượng/đơn giá nhập không hợp lệ.");
     // Giá vốn bình quân gia quyền.
@@ -25,6 +29,7 @@ void SanPham::nhapKho(int soLuong, double donGiaNhap) {
     tonKho_ += soLuong;
     giaNhap_ = tongVon / tonKho_;
 }
+// Chỉ trừ tồn sau khi số lượng dương và không vượt số đang có.
 void SanPham::xuatKho(int soLuong) {
     if (soLuong <= 0) throw std::invalid_argument("Số lượng xuất phải lớn hơn 0.");
     if (soLuong > tonKho_) throw std::logic_error("Không đủ hàng trong kho: " + ten_ + " (còn " + std::to_string(tonKho_) + ").");

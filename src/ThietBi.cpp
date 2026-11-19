@@ -1,3 +1,6 @@
+// Thiết bị có trạng thái hoạt động, thông tin mua và ngày bảo trì.
+// Menu Console lọc những thiết bị cần bảo trì bằng canBaoTri().
+
 #include "ThietBi.h"
 #include <stdexcept>
 #include <utility>

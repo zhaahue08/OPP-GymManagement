@@ -1,3 +1,6 @@
+// TuDo quản lý trạng thái trống, đang dùng theo lượt, thuê tháng hoặc hỏng.
+// Việc gán và trả tủ cập nhật đồng thời trạng thái cùng mã hội viên đang sử dụng.
+
 #include "TuDo.h"
 #include <stdexcept>
 #include <utility>

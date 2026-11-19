@@ -1,3 +1,7 @@
+// HoaDon sở hữu danh sách DongHang theo giá trị và tính tổng từ các dòng đã thêm.
+// Thông tin giảm giá, thanh toán và công nợ được giữ cùng hóa đơn.
+// Console chuẩn bị các dòng hàng trước khi đưa hóa đơn vào HethongCRM.
+
 #include "HoaDon.h"
 #include <algorithm>
 #include <iomanip>
@@ -7,6 +11,7 @@
 #include <utility>
 namespace crm {
 HoaDon::HoaDon(std::string ma, std::string hv, std::string ngay) : ma_(std::move(ma)), maHoiVien_(std::move(hv)), ngay_(std::move(ngay)) { if(ma_.empty()||maHoiVien_.empty()||ngay_.empty()) throw std::invalid_argument("Thông tin hóa đơn không hợp lệ."); }
+// Thêm một DongHang mới vào vector. Việc gộp hay giữ riêng được quyết định bởi luồng gọi hàm.
 void HoaDon::themHang(std::string ten, int sl, double gia, std::string sp) { dongHang_.emplace_back(std::move(ten),sl,gia,std::move(sp)); }
 double HoaDon::tamTinh() const noexcept { double total=0; for(const auto& d:dongHang_) total += d.thanhTien(); return total; }
 double HoaDon::tongTien() const noexcept { return std::max(0.0, tamTinh() - giamGia_); }
@@ -18,11 +23,13 @@ const std::string& HoaDon::maNhanVien() const noexcept{return maNhanVien_;} void
 const std::string& HoaDon::ghiChu() const noexcept{return ghiChu_;} void HoaDon::datGhiChu(std::string text){ghiChu_=std::move(text);}
 double HoaDon::giamGia() const noexcept{return giamGia_;}
 void HoaDon::datGiamGia(double soTien){if(soTien<0||soTien>tamTinh())throw std::invalid_argument("Số tiền giảm giá không hợp lệ.");giamGia_=soTien;}
+// Đặt số tiền đã trả cho hóa đơn và xác định cờ còn nợ với dung sai 0,5.
 void HoaDon::ghiNhanThanhToan(double daTra, std::string cach) {
     if (daTra < 0 || daTra > tongTien() + 0.5) throw std::invalid_argument("Số tiền thanh toán phải từ 0 đến tổng hóa đơn.");
     if (!cach.empty()) phuongThuc_ = std::move(cach);
     daThanhToan_ = std::min(daTra, tongTien()); coCongNo_ = daThanhToan_ + 0.5 < tongTien();
 }
+// Thu thêm vào số đã thanh toán, số tiền phải dương và nằm trong khoản nợ cho phép.
 void HoaDon::thuNo(double soTien, std::string cach) {
     if (!coCongNo_) throw std::logic_error("Hóa đơn này không còn công nợ.");
     if (soTien <= 0 || soTien > conNo() + 0.5) throw std::invalid_argument("Số tiền thu nợ không hợp lệ.");
@@ -42,5 +49,6 @@ std::ostream& operator<<(std::ostream& out,const HoaDon& hd) {
     if(hd.conNo()>0) out<<"Còn nợ: "<<hd.conNo()<<" VND\n";
     return out;
 }
+// Đọc vào hóa đơn tạm trước, chỉ gán sang hd sau khi các dòng hàng đã được đọc hợp lệ.
 std::istream& operator>>(std::istream& in,HoaDon& hd) { std::string ma,hv,date,name; int n; double price; if(!(in>>ma>>hv>>date>>n) || n<0) { in.setstate(std::ios::failbit); return in; } HoaDon tmp(ma,hv,date); for(int i=0;i<n;++i) { if(!(in>>std::quoted(name)>>tmp.dongHang_.emplace_back().soLuong>>price)) { in.setstate(std::ios::failbit); return in; } auto& d=tmp.dongHang_.back(); d.ten=name; d.donGia=price; if(d.soLuong<=0||price<0) { in.setstate(std::ios::failbit); return in; } } hd=std::move(tmp); return in; }
 }

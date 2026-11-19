@@ -1,3 +1,6 @@
+// Voucher tính khoản giảm theo phần trăm hoặc số tiền cố định.
+// Giá sau giảm được chặn ở 0, phần trăm hợp lệ nằm trong khoảng lớn hơn 0 đến 100.
+
 #include "Voucher.h"
 #include <algorithm>
 #include <stdexcept>

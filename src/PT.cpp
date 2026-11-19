@@ -1,3 +1,7 @@
+// PT kế thừa NhanVien và bổ sung chuyên môn, ca làm cùng các mức phí theo buổi.
+// Console có thể ghi nhận ca dạy và chấm công trực tiếp để xem thống kê, hoa hồng.
+// tinhLuong() ghi đè hàm ảo của NhanVien để cộng phần thu nhập từ buổi dạy.
+
 #include "PT.h"
 #include <stdexcept>
 #include <utility>

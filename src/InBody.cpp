@@ -1,3 +1,6 @@
+// InBody giữ chỉ số cơ thể và tính BMI từ cân nặng cùng chiều cao quy đổi sang mét.
+// Toán tử nhập thử dựng một giá trị hợp lệ trước khi gán vào đối tượng đích.
+
 #include "InBody.h"
 #include <istream>
 #include <ostream>
@@ -8,5 +11,6 @@ double InBody::bmi() const { if(chieuCaoCm_<=0)throw std::logic_error("Chưa có
 double InBody::chieuCao()const noexcept{return chieuCaoCm_;} double InBody::canNang()const noexcept{return canNangKg_;} double InBody::phanTramMo()const noexcept{return phanTramMo_;} double InBody::khoiLuongCo()const noexcept{return khoiLuongCoKg_;}
 const char* InBody::danhGiaBMI() const { const double v=bmi(); if(v<18.5)return "Thiếu cân"; if(v<23)return "Bình thường"; if(v<25)return "Thừa cân"; return "Béo phì"; }
 std::ostream& operator<<(std::ostream& out,const InBody& x){return out<<"Cao(cm) Can(kg) Mo(%) Co(kg)\n"<<x.chieuCaoCm_<<' '<<x.canNangKg_<<' '<<x.phanTramMo_<<' '<<x.khoiLuongCoKg_<<"\nBMI: "<<x.bmi();}
+// Dựng một InBody mới để kiểm tra bốn chỉ số. Nếu dữ liệu sai, đặt failbit trên luồng nhập.
 std::istream& operator>>(std::istream& in,InBody& x){double a,b,c,d;if(in>>a>>b>>c>>d){try{x=InBody(a,b,c,d);}catch(...){in.setstate(std::ios::failbit);}}return in;}
 }

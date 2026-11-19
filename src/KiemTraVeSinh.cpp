@@ -1,3 +1,6 @@
+// Biên bản vệ sinh giữ khu vực, người kiểm tra, ngày và kết quả đạt hoặc không đạt.
+// Console tạo biên bản từ dữ liệu nhập rồi chuyển cho HethongCRM lưu trong bộ nhớ.
+
 #include "KiemTraVeSinh.h"
 #include <stdexcept>
 #include <utility>

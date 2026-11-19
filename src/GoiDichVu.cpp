@@ -1,3 +1,7 @@
+// GoiDichVu giữ giá và quyền lợi của gói, còn ChienLuocGia quyết định công thức tính phí.
+// Lời gọi qua tham chiếu ChienLuocGia sử dụng đa hình để chọn giá tiêu chuẩn hoặc giảm theo hạng.
+// Voucher tiếp tục giảm trên mức giá do chiến lược tính ra.
+
 #include "GoiDichVu.h"
 #include "HoiVien.h"
 #include <stdexcept>
@@ -48,7 +52,9 @@ std::string GoiDichVu::moTaThoiHan() const {
     if (soBuoiPT_ > 0) text += ", " + std::to_string(soBuoiPT_) + " buổi PT";
     return text;
 }
+// Ủy quyền công thức cho strategy qua hàm ảo. Cùng một gói có thể được tính bằng các chiến lược khác nhau.
 double GoiDichVu::tinhPhiDichVu(const HoiVien& hv, const ChienLuocGia& strategy, const Voucher* voucher) const { return strategy.tinhPhiDichVu(hv, *this, voucher); }
+// Tính hạn theo ngày sử dụng trọn vẹn, nên cuối cùng trừ một ngày khỏi mốc kế tiếp.
 Date GoiDichVu::tinhNgayHetHan(Date batDau) const {
     if (!batDau.ok()) throw std::invalid_argument("Ngày bắt đầu không hợp lệ.");
     if (soThang_ == 0 && soNgay_ == 0) return batDau; // vé ngày: dùng trong ngày bắt đầu
@@ -57,6 +63,7 @@ Date GoiDichVu::tinhNgayHetHan(Date batDau) const {
 }
 double ChienLuocGia::tinhPhiDichVu(const HoiVien& hv, GoiTap goi, const Voucher* voucher) const { return tinhPhiDichVu(hv, GoiDichVu(goi), voucher); }
 std::string GiaTieuChuan::ten() const { return "Giá tiêu chuẩn"; }
+// Chọn giá sinh viên khi hồ sơ đủ điều kiện và gói có mức giá riêng, rồi áp dụng voucher.
 double GiaTieuChuan::tinhPhiDichVu(const HoiVien& hv, const GoiDichVu& goi, const Voucher* voucher) const {
     const double base = (hv.laSinhVien() && goi.giaSinhVien() > 0) ? goi.giaSinhVien() : goi.giaGoc();
     return voucher ? voucher->apDung(base) : base;
@@ -68,6 +75,7 @@ double GiaTheoHangThanhVien::tyLeGiamTheoHang(const std::string& hang) noexcept 
     if (hang == "Bạc") return 0.03;
     return 0;
 }
+// Lấy giá cơ sở chưa có voucher, giảm theo hạng trước, sau đó áp dụng voucher nếu có.
 double GiaTheoHangThanhVien::tinhPhiDichVu(const HoiVien& hv, const GoiDichVu& goi, const Voucher* voucher) const {
     const double base = GiaTieuChuan{}.tinhPhiDichVu(hv, goi) * (1.0 - tyLeGiamTheoHang(hv.hang()));
     return voucher ? voucher->apDung(base) : base;
