@@ -1,3 +1,6 @@
+// Tổng hợp dữ liệu có sẵn trong HethongCRM thành các dòng báo cáo theo thời gian hoặc đối tượng.
+// Các hàm nhận tham chiếu const để đọc dữ liệu, kết quả được trả về trong các bộ sưu tập.
+
 #include "BaoCao.h"
 #include "HethongCRM.h"
 #include <algorithm>
