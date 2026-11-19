@@ -1,3 +1,6 @@
+// Cài đặt các bản ghi đăng ký gói, chấm công, phản hồi, InBody, nhật ký tập và CSKH.
+// Các bản ghi lưu mã đối tượng liên quan để HethongCRM tra cứu và tổng hợp khi cần.
+
 #include "BanGhi.h"
 #include <stdexcept>
 #include <utility>
